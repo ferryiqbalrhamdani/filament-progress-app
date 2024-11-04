@@ -15,6 +15,8 @@ class ReceivedsRelationManager extends RelationManager
 {
     protected static string $relationship = 'receiveds';
 
+    protected static ?string $modelLabel = 'penerimaan';
+
     public function form(Form $form): Form
     {
         return $form
@@ -53,6 +55,7 @@ class ReceivedsRelationManager extends RelationManager
             ])
             ->headerActions([
                 Tables\Actions\CreateAction::make()
+                    ->label('Buat Penerimaan Baru')
                     ->createAnother(false)
                     ->after(function ($record) {
                         $ownerRecord = $this->getOwnerRecord();

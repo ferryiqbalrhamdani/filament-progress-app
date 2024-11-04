@@ -63,6 +63,7 @@ class MarcendiserResource extends Resource
                 ]),
 
                 Forms\Components\Section::make('Barang di Kontrak')
+                    ->description('Input dan simpan barang di kontrak terlebih dahulu untuk melanjutkan proses.')
                     ->schema([
                         Forms\Components\TextInput::make('jumlah_item')
                             ->mask(RawJs::make('$money($input)'))
@@ -128,6 +129,7 @@ class MarcendiserResource extends Resource
                 Tables\Columns\TextColumn::make('jumlah_ea')
                     ->label('Barang Dikontrak')
                     ->badge()
+                    ->default(0)
                     ->alignment(Alignment::Center)
                     // ->description(function (Marcendiser $record) {
                     //     return 'Barang Diterima: ' . $record->receiveds->sum('jumlah_ea');
@@ -139,6 +141,7 @@ class MarcendiserResource extends Resource
                     ->toggleable(),
                 Tables\Columns\TextColumn::make('receiveds.jumlah_ea')
                     ->label('Barang Diterima')
+                    ->default(0)
                     ->numeric()
                     ->badge()
                     ->alignment(Alignment::Center)
@@ -244,6 +247,10 @@ class MarcendiserResource extends Resource
             ])
             ->query(
                 fn(Marcendiser $query) => $query->whereHas('project', function (Builder $query) {
+                    if (Auth::user()->roles->contains('name', 'super_admin')) {
+                        return $query;
+                    }
+
                     return $query->where('pic_id', Auth::id());
                 })
             );

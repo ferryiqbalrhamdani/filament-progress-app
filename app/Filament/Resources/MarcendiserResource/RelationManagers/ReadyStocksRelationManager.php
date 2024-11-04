@@ -14,6 +14,9 @@ class ReadyStocksRelationManager extends RelationManager
 {
     protected static string $relationship = 'readyStocks';
 
+    protected static ?string $modelLabel = 'stok yang tersedia';
+
+
     public function form(Form $form): Form
     {
         return $form
@@ -49,6 +52,7 @@ class ReadyStocksRelationManager extends RelationManager
             ])
             ->headerActions([
                 Tables\Actions\CreateAction::make()
+                    ->label('Buat Stok Baru')
                     ->createAnother(false)
                     ->visible(fn(RelationManager $livewire) => $livewire->getRelationship()->count() === 0),
             ])

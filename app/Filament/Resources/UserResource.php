@@ -161,6 +161,7 @@ class UserResource extends Resource
                 Tables\Actions\EditAction::make(),
                 Tables\Actions\DeleteAction::make(),
                 Tables\Actions\Action::make('Reset Password')
+                    ->icon('heroicon-s-arrow-path-rounded-square')
                     ->requiresConfirmation()
                     ->action(
                         function (User $record, array $data): void {

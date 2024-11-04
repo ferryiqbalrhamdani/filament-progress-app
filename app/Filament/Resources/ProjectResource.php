@@ -115,6 +115,7 @@ class ProjectResource extends Resource
                                         ->schema([
                                             Forms\Components\Radio::make('bebas_pajak')
                                                 ->inline()
+                                                ->required()
                                                 ->boolean()
                                                 ->inlineLabel(false)
                                                 ->reactive()
@@ -122,6 +123,7 @@ class ProjectResource extends Resource
 
                                             Forms\Components\Radio::make('bebas_pajak_khusus')
                                                 ->inline()
+                                                ->required()
                                                 ->inlineLabel(false)
                                                 ->options([
                                                     'SKTD' => 'SKTD',
@@ -143,11 +145,13 @@ class ProjectResource extends Resource
                                                 ->options(AsalBrand::all()->pluck('name', 'id'))
                                                 ->reactive() // Makes the form update when the radio button changes
                                                 ->hiddenLabel()
+                                                ->required()
                                                 ->inline()
                                                 ->inlineLabel(false),
 
                                             Forms\Components\Radio::make('asal_brand_khusus')
                                                 ->inline()
+                                                ->required()
                                                 ->inlineLabel(false)
                                                 ->options([
                                                     'SP2' => 'SP2',
@@ -165,6 +169,7 @@ class ProjectResource extends Resource
                                     ->schema([
                                         Forms\Components\CheckboxList::make('sertifikatProduk')
                                             ->label('Sertifikat Produk')
+                                            ->required()
                                             ->relationship(
                                                 titleAttribute: 'name',
                                                 modifyQueryUsing: function (Builder $query, callable $get) {
@@ -197,6 +202,7 @@ class ProjectResource extends Resource
                                                     'DP' => 'DP 20%',
                                                     'Termin' => 'Termin',
                                                 ])
+                                                ->required()
                                                 ->reactive()
                                                 ->inline()
                                                 ->hiddenLabel(),
@@ -206,6 +212,7 @@ class ProjectResource extends Resource
                                         ->schema([
                                             Forms\Components\Radio::make('garansi')
                                                 ->boolean()
+                                                ->required()
                                                 ->inline()
                                                 ->reactive()
                                                 ->inlineLabel(false)
@@ -214,6 +221,7 @@ class ProjectResource extends Resource
                                             Forms\Components\Group::make([
                                                 Forms\Components\TextInput::make('lama_garansi')
                                                     ->hiddenLabel()
+                                                    ->required()
                                                     ->helperText('Isi lama garansi dalam angka')
                                                     ->minValue(1)
                                                     ->suffix('Hari')
@@ -237,10 +245,12 @@ class ProjectResource extends Resource
                             ->icon('heroicon-m-clipboard')
                             ->schema([
                                 Forms\Components\TextInput::make('no_kontrak')
+                                    ->required()
                                     ->unique(Project::class, 'no_kontrak', ignoreRecord: true)
                                     ->maxLength(255),
                                 Forms\Components\TextInput::make('nilai_kontrak')
                                     ->mask(RawJs::make('$money($input)'))
+                                    ->required()
                                     ->live(onBlur: true)
                                     ->dehydrated()
                                     ->stripCharacters(',')
@@ -250,8 +260,10 @@ class ProjectResource extends Resource
                                     ->afterStateUpdated(function ($state, Forms\Set $set, Forms\Get $get) {
                                         self::updateTotalItem($state, $get, $set);
                                     }),
-                                Forms\Components\DatePicker::make('tanggal_kontrak'),
-                                Forms\Components\DatePicker::make('tanggal_jatuh_tempo'),
+                                Forms\Components\DatePicker::make('tanggal_kontrak')
+                                    ->required(),
+                                Forms\Components\DatePicker::make('tanggal_jatuh_tempo')
+                                    ->required(),
 
                                 // Fieldset for Termin
                                 Forms\Components\Fieldset::make('Termin')
@@ -265,6 +277,7 @@ class ProjectResource extends Resource
                                 Forms\Components\Fieldset::make('DP')
                                     ->schema([
                                         Forms\Components\Hidden::make('dp_total')
+                                            ->required()
                                             ->hiddenLabel(),
                                         Forms\Components\Placeholder::make('total')
                                             ->content(function (Get $get) {
@@ -313,10 +326,12 @@ class ProjectResource extends Resource
                 Forms\Components\Group::make([
                     Forms\Components\TextInput::make('name')
                         ->default('Termin 1')
+                        ->required()
                         ->hiddenLabel(),
                     Forms\Components\TextInput::make('total')
                         ->mask(RawJs::make('$money($input)'))
                         ->stripCharacters(',')
+                        ->required()
                         ->numeric()
                         ->prefix('Rp ')
                         ->hiddenLabel(),
@@ -628,7 +643,17 @@ class ProjectResource extends Resource
 
                         Infolists\Components\Section::make()
                             ->schema([
-                                Infolists\Components\TextEntry::make('sertifikatProduk.name')
+                                Infolists\Components\TextEntry::make('sertifikatProduk')
+                                    ->label('Sertifikat Produk')
+                                    ->getStateUsing(function ($record) {
+                                        // Dapatkan sertifikat produk yang sesuai dengan asal_brand_id
+                                        return $record->sertifikatProduk()
+                                            ->where('asal_brand_id', $record->asal_brand_id)
+                                            ->pluck('name')
+                                            ->toArray();
+                                    })
+                                    ->listWithLineBreaks() // Atau ->bulleted() jika ingin tampilannya berupa list dengan bullet
+                                    ->visible(fn($record) => $record->asal_brand_id !== null)
                                     ->listWithLineBreaks()
                                     ->bulleted(),
                             ]),

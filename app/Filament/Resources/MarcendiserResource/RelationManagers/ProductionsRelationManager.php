@@ -16,6 +16,9 @@ class ProductionsRelationManager extends RelationManager
 {
     protected static string $relationship = 'productions';
 
+    protected static ?string $modelLabel = 'produksi';
+
+
     public function form(Form $form): Form
     {
         return $form
@@ -63,6 +66,7 @@ class ProductionsRelationManager extends RelationManager
             ])
             ->headerActions([
                 Tables\Actions\CreateAction::make()
+                    ->label('Buat Produksi Baru')
                     ->createAnother(false)
                     ->visible(fn(RelationManager $livewire) => $livewire->getRelationship()->count() === 0),
             ])
