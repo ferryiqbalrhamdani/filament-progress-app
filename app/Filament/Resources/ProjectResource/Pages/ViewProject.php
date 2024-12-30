@@ -7,6 +7,7 @@ use Filament\Actions;
 use Filament\Resources\Pages\ViewRecord;
 use Filament\Infolists;
 use Filament\Infolists\Infolist;
+use Illuminate\Support\Js;
 
 class ViewProject extends ViewRecord
 {
@@ -14,11 +15,11 @@ class ViewProject extends ViewRecord
     protected function getHeaderActions(): array
     {
         return [
-            Actions\Action::make('Kembali')
-                ->label('Kembali') // Set label for the button
-                ->url($this->getResource()::getUrl('index')) // Redirect to the index page of the resource
-                ->icon('heroicon-o-arrow-left') // Optionally set an icon,
-                ->outlined()
+            Actions\Action::make('kembali')
+                ->label("kembali")
+                ->alpineClickHandler('document.referrer ? window.history.back() : (window.location.href = ' . Js::from($this->previousUrl ?? static::getResource()::getUrl()) . ')')
+                ->color('gray')
+                ->icon('heroicon-o-arrow-left')
         ];
     }
 }

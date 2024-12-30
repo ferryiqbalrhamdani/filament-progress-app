@@ -9,7 +9,13 @@ class Kontrak extends Model
 {
     use HasFactory;
 
-    protected $fillable = ['project_id', 'progres', 'bobot', 'user_input_by'];
+    protected $fillable = [
+        'project_id',
+        'progres',
+        'bobot',
+        'user_input_by',
+        'file',
+    ];
 
     public function project()
     {

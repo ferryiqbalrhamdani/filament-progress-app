@@ -6,6 +6,7 @@ use Filament\Actions;
 use Illuminate\Support\Facades\Auth;
 use Filament\Resources\Pages\EditRecord;
 use App\Filament\Resources\PenagihanResource;
+use Illuminate\Support\Js;
 
 class EditPenagihan extends EditRecord
 {
@@ -15,11 +16,11 @@ class EditPenagihan extends EditRecord
     {
         return [
             Actions\DeleteAction::make(),
-            Actions\Action::make('Kembali')
-                ->label('Kembali') // Set label for the button
-                ->url($this->getResource()::getUrl('index')) // Redirect to the index page of the resource
-                ->icon('heroicon-o-arrow-left') // Optionally set an icon,
-                ->outlined()
+            Actions\Action::make('kembali')
+                ->label("kembali")
+                ->alpineClickHandler('document.referrer ? window.history.back() : (window.location.href = ' . Js::from($this->previousUrl ?? static::getResource()::getUrl()) . ')')
+                ->color('gray')
+                ->icon('heroicon-o-arrow-left')
         ];
     }
 
@@ -32,29 +33,44 @@ class EditPenagihan extends EditRecord
         }
 
         $dataPenagihan = $this->record->penagihanProject->toArray();
+        $dataBast = $this->record->penagihanBast->toArray();
 
         // Hitung progres untuk penagihan dengan bobot 50
-        $this->hitungProgresTask($dataPenagihan, 10);
+        $this->hitungProgresTask($dataBast, $dataPenagihan, 10);
 
         // Update total progres proyek berdasarkan semua task
         $this->updateTotalProgresProject();
     }
 
     // Fungsi untuk menghitung progres dari task biasa
-    protected function hitungProgresTask(array $data, int $bobot): int
+    protected function hitungProgresTask(array $bast, array $data, int $bobot): int
     {
         $jumlahTotal = count($data);
         if ($jumlahTotal === 0) {
             return 0;
         }
 
+        $filteredDataBast = array_map(function ($item) {
+            return [
+                'no_bast' => $item['no_bast'] ?? null,
+                'tanggal_bast' => $item['tanggal_bast'] ?? null,
+            ];
+        }, $bast);
+
+        $jumlahNoBast = count(array_filter($filteredDataBast, fn($item) => $item['no_bast'] !== null));
+        $jumlahTanggalBast = count(array_filter($filteredDataBast, fn($item) => $item['tanggal_bast'] !== null));
+
         $jumlahSelesai = count(array_filter($data, function ($item) {
             return $item['status'] === true;
         }));
 
-        $progres = floor(($jumlahSelesai / $jumlahTotal) * 100);
+        $progres = floor((($jumlahSelesai + $jumlahNoBast + $jumlahTanggalBast) / ($jumlahTotal + 2)) * 100);
+        if ($progres > 100) {
+            $progres = 100.0;
+        }
 
         $bobotRecord = floor(($progres / 100) * $bobot);
+
 
         return $this->record->update([
             'progres' => $progres,

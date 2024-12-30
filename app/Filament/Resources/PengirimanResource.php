@@ -151,29 +151,29 @@ class PengirimanResource extends Resource
                                             ->addActionLabel('Tambah'),
                                     ])
                                     ->columns(1),
-                                Forms\Components\Fieldset::make('BA BAST')
-                                    ->schema([
-                                        Forms\Components\Repeater::make('pengirimanBast')
-                                            ->relationship() // This assumes 'pengirimanBast' is a hasOne or belongsTo relationship
-                                            ->schema([
-                                                Forms\Components\TextInput::make('no_bast')
-                                                    ->label('No. BAST')
-                                                    ->required()
-                                                    ->inlineLabel()
-                                                    ->maxLength(255),
-                                                Forms\Components\DatePicker::make('tanggal_bast')
-                                                    ->label('Tgl. BAST')
-                                                    ->required()
-                                                    ->inlineLabel(),
-                                            ])
-                                            ->reorderable(false)
-                                            ->hiddenLabel()
-                                            ->collapsible(false)
-                                            ->maxItems(1)
-                                            ->defaultItems(1) // Always display one item in the repeater
-                                            ->columnSpanFull()
-                                            ->addActionLabel('Tambah'),
-                                    ]),
+                                // Forms\Components\Fieldset::make('BA BAST')
+                                //     ->schema([
+                                //         Forms\Components\Repeater::make('pengirimanBast')
+                                //             ->relationship() // This assumes 'pengirimanBast' is a hasOne or belongsTo relationship
+                                //             ->schema([
+                                //                 Forms\Components\TextInput::make('no_bast')
+                                //                     ->label('No. BAST')
+                                //                     ->required()
+                                //                     ->inlineLabel()
+                                //                     ->maxLength(255),
+                                //                 Forms\Components\DatePicker::make('tanggal_bast')
+                                //                     ->label('Tgl. BAST')
+                                //                     ->required()
+                                //                     ->inlineLabel(),
+                                //             ])
+                                //             ->reorderable(false)
+                                //             ->hiddenLabel()
+                                //             ->collapsible(false)
+                                //             ->maxItems(1)
+                                //             ->defaultItems(1) // Always display one item in the repeater
+                                //             ->columnSpanFull()
+                                //             ->addActionLabel('Tambah'),
+                                //     ]),
                             ]),
 
                     ])
@@ -306,6 +306,9 @@ class PengirimanResource extends Resource
             //     })
             // )
             ->columns([
+                Tables\Columns\TextColumn::make('index')
+                    ->label('#')
+                    ->rowIndex(),
                 ViewColumn::make('progres')
                     ->sortable()
                     ->alignment(Alignment::Center)

@@ -11,9 +11,12 @@ use Filament\Tables\Table;
 use Filament\Resources\Resource;
 use Illuminate\Support\Facades\Auth;
 use Filament\Support\Enums\Alignment;
+use Filament\Support\Enums\FontWeight;
 use Filament\Tables\Columns\ViewColumn;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Support\Facades\Storage;
 use Filament\Forms\Components\ViewField;
+use Filament\Notifications\Notification;
 use Illuminate\Database\Eloquent\Builder;
 use App\Filament\Resources\PenagihanResource\Pages;
 use Illuminate\Database\Eloquent\SoftDeletingScope;
@@ -35,27 +38,58 @@ class PenagihanResource extends Resource
                         ViewField::make('progres')
                             ->view('tables.columns.status-progres')
                     ]),
-                Forms\Components\Section::make([
-                    Forms\Components\Placeholder::make('project.nama_pengadaan')
-                        ->content(fn(Penagihan $record): string => $record->project->nama_pengadaan),
-                    Forms\Components\Placeholder::make('project.no_kontrak')
-                        ->content(fn(Penagihan $record): string => $record->project->no_kontrak),
-                    Forms\Components\Group::make([
-                        Forms\Components\Placeholder::make('project.no_up')
-                            ->content(fn(Penagihan $record): string => $record->project->no_up),
-                        Forms\Components\Placeholder::make('project.tahun_anggaran')
-                            ->content(fn(Penagihan $record): string => $record->project->tahun_anggaran),
-                        Forms\Components\Placeholder::make('project.pic.first_name')
-                            ->label('PIC')
-                            ->content(fn(Penagihan $record): string => $record->project->pic->first_name . ' ' . $record->project->pic->last_name),
-                        Forms\Components\Placeholder::make('userInputBy.first_name')
-                            ->label('Penanggung Jawab')
-                            ->content(fn(Penagihan $record): string => $record->userInputBy?->first_name  ?? '-' . ' ' . $record->userInputBy?->last_name),
+                Forms\Components\Group::make()
+                    ->schema([
+                        Forms\Components\Section::make([
+                            Forms\Components\Placeholder::make('project.nama_pengadaan')
+                                ->content(fn(Penagihan $record): string => $record->project->nama_pengadaan),
+                            Forms\Components\Placeholder::make('project.no_kontrak')
+                                ->content(fn(Penagihan $record): string => $record->project->no_kontrak),
+                            Forms\Components\Group::make([
+                                Forms\Components\Placeholder::make('project.no_up')
+                                    ->content(fn(Penagihan $record): string => $record->project->no_up),
+                                Forms\Components\Placeholder::make('project.tahun_anggaran')
+                                    ->content(fn(Penagihan $record): string => $record->project->tahun_anggaran),
+                                Forms\Components\Placeholder::make('project.pic.first_name')
+                                    ->label('PIC')
+                                    ->content(fn(Penagihan $record): string => $record->project->pic->first_name . ' ' . $record->project->pic->last_name),
+                                Forms\Components\Placeholder::make('userInputBy.first_name')
+                                    ->label('Penanggung Jawab')
+                                    ->content(fn(Penagihan $record): string => $record->userInputBy?->first_name  ?? '-' . ' ' . $record->userInputBy?->last_name),
+                            ])
+                                ->columns(4),
+                        ]),
                     ])
-                        ->columns(4),
-                ]),
+                    ->columnSpan(['lg' => 3]),
+                Forms\Components\Section::make('BAST')
+                    ->collapsible(true)
+                    ->schema([
+                        Forms\Components\Repeater::make('penagihanBAST')
+                            ->relationship() // This assumes 'pengirimanBast' is a hasOne or belongsTo relationship
+                            ->schema([
+                                Forms\Components\TextInput::make('no_bast')
+                                    ->label('No. BAST')
+                                    ->required()
+                                    ->inlineLabel()
+                                    ->maxLength(255),
+                                Forms\Components\DatePicker::make('tanggal_bast')
+                                    ->label('Tgl. BAST')
+                                    ->required()
+                                    ->inlineLabel(),
+                            ])
+                            ->reorderable(false)
+                            ->hiddenLabel()
+                            ->defaultItems(1) // Always display one item in the repeater
+                            ->columnSpanFull()
+                            ->addActionLabel('Tambah'),
+                    ]),
+
                 self::getItemsRepeater(),
-            ]);
+
+
+            ])
+            ->columns(3)
+        ;
     }
 
     public static function getItemsRepeater(): TableRepeater
@@ -63,7 +97,6 @@ class PenagihanResource extends Resource
         return TableRepeater::make('penagihanProject')
             ->relationship('penagihanProject')
             ->schema([
-
                 Forms\Components\TextInput::make('name')
                     ->label('Nama'),
                 Forms\Components\Select::make('jenis_penagihan')
@@ -101,6 +134,9 @@ class PenagihanResource extends Resource
             //     })
             // )
             ->columns([
+                Tables\Columns\TextColumn::make('index')
+                    ->label('#')
+                    ->rowIndex(),
                 ViewColumn::make('progres')
                     ->sortable()
                     ->alignment(Alignment::Center)
@@ -166,6 +202,34 @@ class PenagihanResource extends Resource
                     ->date()
                     ->sortable()
                     ->toggleable(),
+                Tables\Columns\TextColumn::make('file')
+                    ->label('File')
+                    ->icon('heroicon-o-arrow-down-tray')
+                    ->color('primary')
+                    ->badge()
+                    ->weight(FontWeight::Bold)
+                    ->formatStateUsing(fn(string $state): string => "Download")
+                    ->action(function ($record) {
+                        try {
+                            $filePath = public_path("storage/{$record->file}");
+
+                            if (!file_exists($filePath)) {
+                                return Notification::make()
+                                    ->title('Tidak bisa download.')
+                                    ->body('tidak terdapat data yang ingin di download.')
+                                    ->danger()
+                                    ->send();
+                            }
+
+                            return response()->download($filePath);
+                        } catch (\Exception $e) {
+                            return Notification::make()
+                                ->title('Tidak bisa download.')
+                                ->body('tidak terdapat data yang ingin di download.')
+                                ->danger()
+                                ->send();
+                        }
+                    }),
                 Tables\Columns\TextColumn::make('created_at')
                     ->dateTime()
                     ->sortable()

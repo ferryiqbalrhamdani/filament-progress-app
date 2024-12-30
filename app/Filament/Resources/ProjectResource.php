@@ -350,8 +350,11 @@ class ProjectResource extends Resource
     public static function table(Table $table): Table
     {
         return $table
-            ->deferLoading()
+            // ->deferLoading()
             ->columns([
+                Tables\Columns\TextColumn::make('index')
+                    ->label('#')
+                    ->rowIndex(),
                 ViewColumn::make('progres')
                     ->sortable()
                     ->alignment(Alignment::Center)
@@ -732,6 +735,11 @@ class ProjectResource extends Resource
                         Infolists\Components\ViewEntry::make('kontrak.progres')
                             ->view('infolists.components.progres')
                             ->hiddenLabel(),
+                        Infolists\Components\Section::make([
+                            Infolists\Components\TextEntry::make('kontrak.userInputBy.first_name')
+                                ->label('Penanggung Jawab')
+                                ->badge(),
+                        ]),
                         Infolists\Components\Section::make()
                             ->schema([
                                 Infolists\Components\TextEntry::make('Nama Kontrak'),
@@ -804,47 +812,43 @@ class ProjectResource extends Resource
                                 ->label('Penanggung Jawab')
                                 ->badge(),
                         ]),
-                        Infolists\Components\RepeatableEntry::make('pengiriman.pengirimanBaAnname')
+                        Infolists\Components\Section::make('BA Anname')
+                            ->collapsible(true)
                             ->schema([
-                                Infolists\Components\TextEntry::make('no_ba_anname')
-                                    ->label('No BA Anname'),
-                                Infolists\Components\TextEntry::make('tanggal_ba_anname')
-                                    ->label('Tgl. BA Anname')
-                                    ->date(),
-                                Infolists\Components\IconEntry::make('status')
-                                    ->boolean()
-                                    ->default(fn($record) => $record ? true : false)
-                                    ->label('Status'),
-                            ])
-                            ->hiddenLabel()
-                            ->columns(3),
-                        Infolists\Components\RepeatableEntry::make('pengiriman.pengirimanBaInname')
+                                Infolists\Components\RepeatableEntry::make('pengiriman.pengirimanBaAnname')
+                                    ->schema([
+                                        Infolists\Components\TextEntry::make('no_ba_anname')
+                                            ->label('No BA Anname'),
+                                        Infolists\Components\TextEntry::make('tanggal_ba_anname')
+                                            ->label('Tgl. BA Anname')
+                                            ->date(),
+                                        Infolists\Components\IconEntry::make('status')
+                                            ->boolean()
+                                            ->default(fn($record) => $record ? true : false)
+                                            ->label('Status'),
+                                    ])
+                                    ->hiddenLabel()
+                                    ->columns(3),
+                            ]),
+                        Infolists\Components\Section::make('BA Inname')
+                            ->collapsible(true)
                             ->schema([
-                                Infolists\Components\TextEntry::make('no_ba_inname')
-                                    ->label('No BA Inname'),
-                                Infolists\Components\TextEntry::make('tanggal_ba_inname')
-                                    ->label('Tgl. BA Inname')
-                                    ->date(),
-                                Infolists\Components\IconEntry::make('status')
-                                    ->boolean()
-                                    ->default(fn($record) => $record ? true : false)
-                                    ->label('Status'),
-                            ])
-                            ->hiddenLabel()
-                            ->columns(3),
-                        Infolists\Components\Section::make('')
-                            ->schema([
-                                Infolists\Components\TextEntry::make('pengiriman.pengirimanBast.no_bast')
-                                    ->label('No BAST'),
-                                Infolists\Components\TextEntry::make('pengiriman.pengirimanBast.tanggal_bast')
-                                    ->label('Tgl. BAST')
-                                    ->date(),
-                                Infolists\Components\IconEntry::make('pengiriman.pengirimanBast')
-                                    ->boolean()
-                                    ->default(fn($record) => $record->no_bast ? true : false)
-                                    ->label('Status'),
-                            ])
-                            ->columns(3),
+                                Infolists\Components\RepeatableEntry::make('pengiriman.pengirimanBaInname')
+                                    ->schema([
+                                        Infolists\Components\TextEntry::make('no_ba_inname')
+                                            ->label('No BA Inname'),
+                                        Infolists\Components\TextEntry::make('tanggal_ba_inname')
+                                            ->label('Tgl. BA Inname')
+                                            ->date(),
+                                        Infolists\Components\IconEntry::make('status')
+                                            ->boolean()
+                                            ->default(fn($record) => $record ? true : false)
+                                            ->label('Status'),
+                                    ])
+                                    ->hiddenLabel()
+                                    ->columns(3),
+                            ]),
+
 
                     ]),
                 Infolists\Components\Section::make('Penagihan')
@@ -858,6 +862,24 @@ class ProjectResource extends Resource
                                 ->label('Penanggung Jawab')
                                 ->badge(),
                         ]),
+                        Infolists\Components\Section::make('BAST')
+                            ->collapsible(true)
+                            ->schema([
+                                Infolists\Components\RepeatableEntry::make('penagihan.penagihanBast')
+                                    ->schema([
+                                        Infolists\Components\TextEntry::make('no_bast')
+                                            ->label('No BAST'),
+                                        Infolists\Components\TextEntry::make('tanggal_bast')
+                                            ->label('Tgl. BAST')
+                                            ->date(),
+                                        Infolists\Components\IconEntry::make('status')
+                                            ->boolean()
+                                            ->default(fn($record) => $record ? true : false)
+                                            ->label('Status'),
+                                    ])
+                                    ->hiddenLabel()
+                                    ->columns(3),
+                            ]),
                         Infolists\Components\Section::make()
                             ->schema([
                                 Infolists\Components\TextEntry::make('Nama Penagihan'),

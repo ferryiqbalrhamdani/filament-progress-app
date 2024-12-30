@@ -31,29 +31,35 @@ class KontrakResource extends Resource
     {
         return $form
             ->schema([
-                Forms\Components\Section::make('Progres')
+                Forms\Components\Group::make()
                     ->schema([
-                        ViewField::make('progres')
-                            ->view('tables.columns.status-progres')
-                    ]),
-                Forms\Components\Section::make([
-                    Forms\Components\Placeholder::make('project.nama_pengadaan')
-                        ->content(fn(kontrak $record): string => $record->project->nama_pengadaan),
-                    Forms\Components\Placeholder::make('project.no_kontrak')
-                        ->content(fn(kontrak $record): string => $record->project->no_kontrak),
-                    Forms\Components\Group::make([
-                        Forms\Components\Placeholder::make('project.no_up')
-                            ->content(fn(kontrak $record): string => $record->project->no_up),
-                        Forms\Components\Placeholder::make('project.tahun_anggaran')
-                            ->content(fn(kontrak $record): string => $record->project->tahun_anggaran),
-                        Forms\Components\Placeholder::make('project.pic.first_name')
-                            ->label('PIC')
-                            ->content(fn(kontrak $record): string => $record->project->pic->first_name . ' ' . $record->project->pic->last_name),
+                        Forms\Components\Section::make('Progres')
+                            ->schema([
+                                ViewField::make('progres')
+                                    ->view('tables.columns.status-progres')
+                            ]),
+                        Forms\Components\Section::make([
+                            Forms\Components\Placeholder::make('project.nama_pengadaan')
+                                ->content(fn(kontrak $record): string => $record->project->nama_pengadaan),
+                            Forms\Components\Placeholder::make('project.no_kontrak')
+                                ->content(fn(kontrak $record): string => $record->project->no_kontrak),
+                            Forms\Components\Group::make([
+                                Forms\Components\Placeholder::make('project.no_up')
+                                    ->content(fn(kontrak $record): string => $record->project->no_up),
+                                Forms\Components\Placeholder::make('project.tahun_anggaran')
+                                    ->content(fn(kontrak $record): string => $record->project->tahun_anggaran),
+                                Forms\Components\Placeholder::make('project.pic.first_name')
+                                    ->label('PIC')
+                                    ->content(fn(kontrak $record): string => $record->project->pic->first_name . ' ' . $record->project->pic->last_name),
+                            ])
+                                ->columns(3),
+                        ]),
+                        self::getItemsRepeater(),
                     ])
-                        ->columns(3),
-                ]),
-                self::getItemsRepeater(),
-            ]);
+                    ->columnSpan(['lg' => 3]),
+            ])
+            ->columns(3)
+        ;
     }
 
     public static function getItemsRepeater(): TableRepeater
@@ -90,6 +96,9 @@ class KontrakResource extends Resource
             //     })
             // )
             ->columns([
+                Tables\Columns\TextColumn::make('index')
+                    ->label('#')
+                    ->rowIndex(),
                 ViewColumn::make('progres')
                     ->sortable()
                     ->alignment(Alignment::Center)

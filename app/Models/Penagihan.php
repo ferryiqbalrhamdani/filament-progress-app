@@ -14,6 +14,7 @@ class Penagihan extends Model
         'user_input_by',
         'progres',
         'bobot',
+        'file',
     ];
 
     public function project()
@@ -29,5 +30,10 @@ class Penagihan extends Model
     public function penagihanProject()
     {
         return $this->hasMany(PenagihanProject::class, 'penagihan_id')->orderBy('jenis_penagihan', 'desc');
+    }
+
+    public function penagihanBAST()
+    {
+        return $this->belongsToMany(Bast::class, 'penagihan_bast', 'penagihan_id', 'bast_id');
     }
 }

@@ -5,6 +5,7 @@ namespace App\Filament\Resources\PengirimanResource\Pages;
 use Filament\Actions;
 use Illuminate\Support\Facades\Auth;
 use Filament\Resources\Pages\EditRecord;
+use Illuminate\Support\Js;
 use App\Filament\Resources\PengirimanResource;
 
 class EditPengiriman extends EditRecord
@@ -15,11 +16,11 @@ class EditPengiriman extends EditRecord
     {
         return [
             Actions\DeleteAction::make(),
-            Actions\Action::make('Kembali')
-                ->label('Kembali') // Set label for the button
-                ->url($this->getResource()::getUrl('index')) // Redirect to the index page of the resource
-                ->icon('heroicon-o-arrow-left') // Optionally set an icon,
-                ->outlined()
+            Actions\Action::make('kembali')
+                ->label("kembali")
+                ->alpineClickHandler('document.referrer ? window.history.back() : (window.location.href = ' . Js::from($this->previousUrl ?? static::getResource()::getUrl()) . ')')
+                ->color('gray')
+                ->icon('heroicon-o-arrow-left')
         ];
     }
 
@@ -39,7 +40,7 @@ class EditPengiriman extends EditRecord
         $data = $this->record->pengirimanProject->toArray();
         $dataBaAnname = $this->record->pengirimanBaAnname->toArray();
         $dataBaInname = $this->record->pengirimanBaInname->toArray();
-        $dataBast = $this->record->pengirimanBast->toArray();
+        // $dataBast = $this->record->pengirimanBast->toArray();
 
         $filteredData = array_map(function ($item) {
             return [
@@ -62,12 +63,12 @@ class EditPengiriman extends EditRecord
             ];
         }, $dataBaInname);
 
-        $filteredDataBast = array_map(function ($item) {
-            return [
-                'no_bast' => $item['no_bast'] ?? null,
-                'tanggal_bast' => $item['tanggal_bast'] ?? null,
-            ];
-        }, $dataBast);
+        // $filteredDataBast = array_map(function ($item) {
+        //     return [
+        //         'no_bast' => $item['no_bast'] ?? null,
+        //         'tanggal_bast' => $item['tanggal_bast'] ?? null,
+        //     ];
+        // }, $dataBast);
 
         // Count non-null fields
         $jumlahJenisPengiriman = count(array_filter($filteredData, fn($item) => $item['jenis_pengiriman'] !== null));
@@ -76,20 +77,30 @@ class EditPengiriman extends EditRecord
         $jumlahTanggalBaAnname = count(array_filter($filteredDataBaAnname, fn($item) => $item['tanggal_ba_anname'] !== null));
         $jumlahNoBaInname = count(array_filter($filteredDataBaInname, fn($item) => $item['no_ba_inname'] !== null));
         $jumlahTanggalBaInname = count(array_filter($filteredDataBaInname, fn($item) => $item['tanggal_ba_inname'] !== null));
-        $jumlahNoBast = count(array_filter($filteredDataBast, fn($item) => $item['no_bast'] !== null));
-        $jumlahTanggalBast = count(array_filter($filteredDataBast, fn($item) => $item['tanggal_bast'] !== null));
+        // $jumlahNoBast = count(array_filter($filteredDataBast, fn($item) => $item['no_bast'] !== null));
+        // $jumlahTanggalBast = count(array_filter($filteredDataBast, fn($item) => $item['tanggal_bast'] !== null));
 
         // Calculate total possible fields
-        $totalFields = $jumlahNoBaAnname + $jumlahTanggalBaAnname +
-            $jumlahNoBaInname + $jumlahTanggalBaInname + 4;
+        $totalFields = 6;
 
         // Calculate the completion percentage
         $progress = round(((
             $jumlahJenisPengiriman + $jumlahTanggalPengiriman +
             $jumlahNoBaAnname + $jumlahTanggalBaAnname +
-            $jumlahNoBaInname + $jumlahTanggalBaInname +
-            $jumlahNoBast + $jumlahTanggalBast
+            $jumlahNoBaInname + $jumlahTanggalBaInname
+            // + $jumlahNoBast + $jumlahTanggalBast
         ) / $totalFields) * 100);
+
+        // dd([
+        //     'jumlahJenisPengiriman' => $jumlahJenisPengiriman,
+        //     'jumlahTanggalPengiriman' => $jumlahTanggalPengiriman,
+        //     'jumlahNoBaAnname' => $jumlahNoBaAnname,
+        //     'jumlahTanggalBaAnname' => $jumlahTanggalBaAnname,
+        //     'jumlahNoBaInname' => $jumlahNoBaInname,
+        //     'jumlahTanggalBaInname' => $jumlahTanggalBaInname,
+        //     'progress' => $progress,
+        //     'totalFields' => $totalFields,
+        // ]);
 
         $bobot = 20;
         $bobotRecord = floor(($progress / 100) * $bobot);

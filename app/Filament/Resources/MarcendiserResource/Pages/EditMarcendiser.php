@@ -21,4 +21,9 @@ class EditMarcendiser extends EditRecord
                 ->outlined()
         ];
     }
+
+    public function hasCombinedRelationManagerTabsWithContent(): bool
+    {
+        return true;
+    }
 }

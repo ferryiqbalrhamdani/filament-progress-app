@@ -5,6 +5,7 @@ namespace App\Filament\Resources\ProjectResource\Pages;
 use App\Filament\Resources\ProjectResource;
 use Filament\Actions;
 use Filament\Resources\Pages\EditRecord;
+use Illuminate\Support\Js;
 
 class EditProject extends EditRecord
 {
@@ -15,10 +16,10 @@ class EditProject extends EditRecord
         return [
             Actions\DeleteAction::make(),
             Actions\Action::make('Kembali')
-                ->label('Kembali') // Set label for the button
-                ->url($this->getResource()::getUrl('index')) // Redirect to the index page of the resource
-                ->icon('heroicon-o-arrow-left') // Optionally set an icon,
-                ->outlined()
+                ->label("Kembali")
+                ->alpineClickHandler('document.referrer ? window.history.back() : (window.location.href = ' . Js::from($this->previousUrl ?? static::getResource()::getUrl()) . ')')
+                ->color('gray')
+                ->icon('heroicon-o-arrow-left')
         ];
     }
 

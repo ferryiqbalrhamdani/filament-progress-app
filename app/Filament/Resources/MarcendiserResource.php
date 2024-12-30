@@ -89,6 +89,9 @@ class MarcendiserResource extends Resource
         return $table
             ->poll('5s')
             ->columns([
+                Tables\Columns\TextColumn::make('index')
+                    ->label('#')
+                    ->rowIndex(),
                 ViewColumn::make('progres')
                     ->sortable()
                     ->alignment(Alignment::Center)
