@@ -115,7 +115,7 @@ class ProjectResource extends Resource
                                         ->schema([
                                             Forms\Components\Radio::make('bebas_pajak')
                                                 ->inline()
-                                                ->required()
+                                                // ->required()
                                                 ->boolean()
                                                 ->inlineLabel(false)
                                                 ->reactive()
@@ -123,7 +123,7 @@ class ProjectResource extends Resource
 
                                             Forms\Components\Radio::make('bebas_pajak_khusus')
                                                 ->inline()
-                                                ->required()
+                                                // ->required()
                                                 ->inlineLabel(false)
                                                 ->options([
                                                     'SKTD' => 'SKTD',
@@ -145,13 +145,13 @@ class ProjectResource extends Resource
                                                 ->options(AsalBrand::all()->pluck('name', 'id'))
                                                 ->reactive() // Makes the form update when the radio button changes
                                                 ->hiddenLabel()
-                                                ->required()
+                                                // ->required()
                                                 ->inline()
                                                 ->inlineLabel(false),
 
                                             Forms\Components\Radio::make('asal_brand_khusus')
                                                 ->inline()
-                                                ->required()
+                                                // ->required()
                                                 ->inlineLabel(false)
                                                 ->options([
                                                     'SP2' => 'SP2',
@@ -169,7 +169,7 @@ class ProjectResource extends Resource
                                     ->schema([
                                         Forms\Components\CheckboxList::make('sertifikatProduk')
                                             ->label('Sertifikat Produk')
-                                            ->required()
+                                            // ->required()
                                             ->relationship(
                                                 titleAttribute: 'name',
                                                 modifyQueryUsing: function (Builder $query, callable $get) {

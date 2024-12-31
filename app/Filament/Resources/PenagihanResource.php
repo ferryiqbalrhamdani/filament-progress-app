@@ -316,10 +316,11 @@ class PenagihanResource extends Resource
                     }),
             ])
             ->actions([
-                Tables\Actions\ViewAction::make(),
                 Tables\Actions\EditAction::make()
-                    ->visible(fn($record) => $record->user_input_by == Auth::user()->id || $record->user_input_by == NULL && $record->project->status === false),
-                Tables\Actions\DeleteAction::make(),
+                    ->visible(function ($record) {
+                        return ($record->user_input_by === Auth::user()->id || $record->user_input_by === null)
+                            && $record->project->status === false;
+                    }),
             ])
             ->bulkActions([
                 Tables\Actions\BulkActionGroup::make([
