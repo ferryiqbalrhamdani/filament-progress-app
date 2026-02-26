@@ -13,7 +13,7 @@ $user = filament()->auth()->user();
                 </h2>
 
                 <p class="text-sm text-gray-500 dark:text-gray-400">
-                    {{ Auth::user()->first_name.' '.Auth::user()->last_name }}
+                    {{ filament()->getUserName($user) }}
                 </p>
             </div>
 
