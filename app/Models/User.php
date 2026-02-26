@@ -49,8 +49,8 @@ class User extends Authenticatable
         ];
     }
 
-    public function getFullNameAttribute()
+    public function getFilamentName(): string
     {
-        return "{$this->first_name} {$this->last_name}";
+        return $this->getAttributeValue('first_name') . ' ' . $this->getAttributeValue('last_name');
     }
 }
